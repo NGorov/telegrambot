@@ -20,9 +20,10 @@ public class TelegramInboundAutoConfiguration implements AutoCloseable {
 
     public TelegramInboundAutoConfiguration(
             TelegramProperties properties,
-            TelegramInboundSink sink
+            TelegramInboundSink sink,
+            TelegramBotsLongPollingApplication application
     ) {
-        this.application = new TelegramBotsLongPollingApplication();
+        this.application = application;
         try {
             this.application.registerBot(
                     properties.token(),
@@ -31,6 +32,12 @@ public class TelegramInboundAutoConfiguration implements AutoCloseable {
         } catch (TelegramApiException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    TelegramBotsLongPollingApplication telegramBotsLongPollingApplication() {
+        return new TelegramBotsLongPollingApplication();
     }
 
     @Bean

@@ -3,39 +3,33 @@ package com.provisa.telegram.outbound;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TelegramMessageFormatterTest {
 
     private final TelegramMessageFormatter formatter = new TelegramMessageFormatter();
 
     @Test
-    void shouldPrefixBotMessages() {
-        assertThat(formatter.format("hello"))
-                .isEqualTo("Bot: hello");
-    }
-
-    @Test
-    void shouldNormalizeSpaces() {
+    void normalizeSpaces() {
         assertThat(formatter.format("hello   world"))
-                .isEqualTo("Bot: hello world");
+                .isEqualTo("hello world");
     }
 
     @Test
-    void shouldStripServicePrefix() {
-        assertThat(formatter.format("service check status"))
-                .isEqualTo("check status");
-    }
-
-    @Test
-    void shouldTrimResult() {
+    void trimText() {
         assertThat(formatter.format("  hello  "))
-                .isEqualTo("Bot: hello");
+                .isEqualTo("hello");
     }
 
     @Test
-    void shouldRejectNullMessage() {
-        assertThrows(IllegalArgumentException.class,
-                () -> formatter.format(null));
+    void keepTextAsIs() {
+        assertThat(formatter.format("service check status"))
+                .isEqualTo("service check status");
+    }
+
+    @Test
+    void rejectNull() {
+        assertThatThrownBy(() -> formatter.format(null))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
